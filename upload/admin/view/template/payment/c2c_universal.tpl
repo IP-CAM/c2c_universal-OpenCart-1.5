@@ -17,8 +17,26 @@
     <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
       <table class="form">
         <tr>
-          <td><?php echo $placeholder; ?></td>
-          <td></td>
+          <td><?php $text_select_bank; ?></td>
+          <td>
+            <select name="bank">
+              <?php foreach ($banks as $bank) { ?>
+                <option value="<?php echo $bank['code']; ?>" 
+                <?php 
+                  if ($active_bank_code == $bank['code']) { 
+                    echo "selected"; 
+                  } 
+                ?>
+                >
+                <?php echo $bank['name']; ?>
+                </option>
+              <?php } ?>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td><?php echo $text_card_number; ?></td>
+          <td><input type="text" name="card_number"></td>
         </tr>
       </table>
     </form>
