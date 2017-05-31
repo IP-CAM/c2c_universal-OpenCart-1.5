@@ -1,0 +1,25 @@
+<modification>
+	
+	<id>C2c_universal</id>
+	<version>1</version>
+	<vqmver>1</vqmver>
+	<author></author>
+	<email></email>
+	<website>http://</website>
+	
+	<!-- Start Admin Controller -->
+		
+	<file name="admin/controller/module/c2c_universal.php">
+		<operation>
+			<search position="before"><![CDATA[
+			//
+			]]></search>
+			<add><![CDATA[
+			//
+			]]></add>
+		</operation>
+	</file>
+	
+	<!-- End Admin Controller -->
+	
+</modification>
