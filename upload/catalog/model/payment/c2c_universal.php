@@ -2,13 +2,9 @@
 
 class ModelPaymentC2cUniversal extends Model {
 		
-	//Sample DB access - Get all customers
-	function getCustomerData() {
-		$query = "SELECT * FROM " . DB_PREFIX . "customer";
-		$result = $this->db->query($query);
-		return $result->rows;
-	}
-
+	/**
+	 * Вызывается движком, возвращает код, наименование и позицию в списке методов оплаты
+	 */
 	public function getMethod($address, $total) {
 
 		$this->load->language('payment/c2c_universal');
@@ -23,15 +19,15 @@ class ModelPaymentC2cUniversal extends Model {
 
 		$method_data = array();
 
-		if ($status)
-
-		//TO-DO Сделать поле порядок сортировки
+		if ($status) {
 
 			$method_data = array(
 				'code'       => 'c2c_universal',
 				'title'      => $title,
-				'sort_order' => 0
+				'sort_order' => $this->config->get('c2c_universal_sort_order')
 			);
+
+		}
 		
 		return $method_data;
 	}

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Модуль для быстро перевода с карты на карту. Работает через iframe со страницами перевода любого банка.
+ * @author Oleg Brizhanev<mr.brizhanev@yandex.ru>
+ */
+
 class ControllerPaymentC2cUniversal extends Controller {
 	
 	private $error = array(); 
@@ -22,6 +27,8 @@ class ControllerPaymentC2cUniversal extends Controller {
 
 			$this->redirect($this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL'));
 		}
+
+		//Создание текстовых меток
 		
 		$text_strings = array(
 			'heading_title',
@@ -32,6 +39,8 @@ class ControllerPaymentC2cUniversal extends Controller {
 			'text_card_number',
 			'text_select_bank',
 			'entry_status',
+			'entry_order_status',
+			'entry_valid_order_status',
 			'text_enabled',
 			'text_disabled'
 			);
@@ -39,6 +48,9 @@ class ControllerPaymentC2cUniversal extends Controller {
 		foreach ($text_strings as $text) {
 			$this->data[$text] = $this->language->get($text);
 		}
+
+		//Установка банков
+		//TO-DO сделать добавление из админки
 
 		$this->data['banks'] = array(
 			array(
@@ -50,14 +62,17 @@ class ControllerPaymentC2cUniversal extends Controller {
 				'name' => 'Бинбанк'
 				),
 			array(
-				'code' => 3,
-				'name' => 'Московский кредитный банк'
-				),
-			array(
 				'code' => 4,
 				'name' => 'Тинькофф'
 				)		
 			);
+
+		//Установка списка статусов заказов
+
+		$this->load->model('localisation/order_status');
+		$this->data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
+
+		//Установка значений полей 
 
 		if (isset($this->request->post['c2c_universal_active_bank'])) {
 			$this->data['c2c_universal_active_bank'] = $this->request->post['c2c_universal_active_bank'];
@@ -75,6 +90,18 @@ class ControllerPaymentC2cUniversal extends Controller {
 			$this->data['c2c_universal_status'] = $this->request->post['c2c_universal_status'];
 		} else {
 			$this->data['c2c_universal_status'] = $this->config->get('c2c_universal_status');
+		}
+
+		if (isset($this->request->post['c2c_universal_wait_order_status_id'])) {
+			$this->data['c2c_universal_wait_order_status_id'] = $this->request->post['c2c_universal_wait_order_status_id'];
+		} else {
+			$this->data['c2c_universal_wait_order_status_id'] = $this->config->get('c2c_universal_wait_order_status_id');
+		}
+
+		if (isset($this->request->post['c2c_universal_payed_order_status_id'])) {
+			$this->data['c2c_universal_payed_order_status_id'] = $this->request->post['c2c_universal_payed_order_status_id'];
+		} else {
+			$this->data['c2c_universal_payed_order_status_id'] = $this->config->get('c2c_universal_payed_order_status_id');
 		}
 
 		//error handling
@@ -150,6 +177,32 @@ class ControllerPaymentC2cUniversal extends Controller {
 		} else {
 			return FALSE;
 		}	
+	}
+
+	/**
+	 * Вызывается движком во время установки модуля
+	 */
+	public function install() {
+
+		$this->load->model('setting/setting');
+
+		$settings = array();
+
+		//Статус для созданного заказа по умолчанию - "В обработке"
+		$settings['c2c_universal_wait_order_status_id'] =  2;
+
+		//Статус для оплаченного заказа по умолчанию - "Оплачен"
+		$settings['c2c_universal_payed_order_status_id'] = 18;
+
+		//Порядок сортировки по умолчанию  - 0
+		$settings['c2c_universal_sort_order'] = 0;
+
+		//Номер карты, заполним тестовыми данными
+		$settings['c2c_universal_card'] = "4XXX XXXX XXXX XXXX";
+
+		$this->model_setting_setting->editSetting('c2c_universal', $settings);	
+
+
 	}
 
 

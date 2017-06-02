@@ -39,6 +39,30 @@
           <td><input type="text" name="c2c_universal_card" value="<?php echo $c2c_universal_card; ?>"></td>
         </tr>
         <tr>
+          <td><?php echo $entry_order_status; ?></td>
+          <td><select name="c2c_universal_wait_order_status_id">
+            <?php foreach ($order_statuses as $order_status) { ?>
+            <?php if ($order_status['order_status_id'] == $c2c_universal_wait_order_status_id) { ?>
+            <option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+            <?php } else { ?>
+            <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+            <?php } ?>
+            <?php } ?>
+          </select></td>
+        </tr>
+        <tr>
+          <td><?php echo $entry_valid_order_status; ?></td>
+          <td><select name="c2c_universal_payed_order_status_id">
+            <?php foreach ($order_statuses as $order_status) { ?>
+            <?php if ($order_status['order_status_id'] == $c2c_universal_payed_order_status_id) { ?>
+            <option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+            <?php } else { ?>
+            <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+            <?php } ?>
+            <?php } ?>
+          </select></td>
+        </tr>
+        <tr>
           <td><?php echo $entry_status; ?></td>
           <td><select name="c2c_universal_status">
             <?php if ($c2c_universal_status) { ?>
