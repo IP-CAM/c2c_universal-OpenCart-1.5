@@ -2,7 +2,10 @@
 <div id="content">
   <div class="breadcrumb">
     <?php foreach ($breadcrumbs as $breadcrumb) { ?>
-    <?php echo $breadcrumb['separator']; ?><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a>
+    <?php echo $breadcrumb['separator']; ?>
+    <a href="<?php echo $breadcrumb['href']; ?>">
+      <?php echo $breadcrumb['text']; ?>
+    </a>
     <?php } ?>
   </div>
   <?php if ($error_warning) { ?>
@@ -11,72 +14,92 @@
   <div class="box">
     <div class="heading">
       <h1><img src="view/image/module.png" alt="" /> <?php echo $heading_title; ?></h1>
-      <div class="buttons"><a onclick="$('#form').submit();" class="button"><span><?php echo $button_save; ?></span></a><a onclick="location = '<?php echo $cancel; ?>';" class="button"><span><?php echo $button_cancel; ?></span></a></div>
+      <div class="buttons">
+        <a onclick="$('#form').submit();" class="button">
+          <span><?php echo $button_save; ?></span>
+        </a>
+        <a onclick="location = '<?php echo $cancel; ?>';" class="button">
+          <span><?php echo $button_cancel; ?></span>
+        </a>
+      </div>
     </div>
     <div class="content">
       <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
         <table class="form">
+          <!-- Поле выберите банк -->
           <tr>
-            <td><?php echo $text_select_bank; ?></td>
+            <td>
+              <span class="required">*</span><?php echo $text_select_bank; ?>
+            </td>
             <td>
               <select name="c2c_universal_active_bank">
                 <?php foreach ($banks as $bank) { ?>
                 <option value="<?php echo $bank['code']; ?>" 
-                  <?php 
-                  if ($c2c_universal_active_bank == $bank['code']) { 
-                  echo "selected"; 
-                } 
-                ?>
-                >
-                <?php echo $bank['name']; ?>
-              </option>
+                  <?php if ($c2c_universal_active_bank == $bank['code']) { echo "selected"; } ?>>
+                  <?php echo $bank['name']; ?>
+                </option>
+                <?php } ?>
+              </select>
+            </td>
+          </tr>
+          <!-- Поле выберите банк -->
+          <!-- Поле Номер карты -->
+          <tr>
+            <td><span class="required">*</span><?php echo $text_card_number; ?></td>
+            <td><input type="text" name="c2c_universal_card" value="<?php echo $c2c_universal_card; ?>"></td>
+          </tr>
+          <!-- Поле Номер карты -->
+          <!-- Поле статус заказа после подтверждения -->
+          <tr>
+            <td><?php echo $entry_order_status; ?></td>
+            <td><select name="c2c_universal_wait_order_status_id">
+              <?php foreach ($order_statuses as $order_status) { ?>
+              <?php if ($order_status['order_status_id'] == $c2c_universal_wait_order_status_id) { ?>
+              <option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+              <?php } else { ?>
+              <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
               <?php } ?>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td><?php echo $text_card_number; ?></td>
-          <td><input type="text" name="c2c_universal_card" value="<?php echo $c2c_universal_card; ?>"></td>
-        </tr>
-        <tr>
-          <td><?php echo $entry_order_status; ?></td>
-          <td><select name="c2c_universal_wait_order_status_id">
-            <?php foreach ($order_statuses as $order_status) { ?>
-            <?php if ($order_status['order_status_id'] == $c2c_universal_wait_order_status_id) { ?>
-            <option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
-            <?php } else { ?>
-            <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-            <?php } ?>
-            <?php } ?>
-          </select></td>
-        </tr>
-        <tr>
-          <td><?php echo $entry_valid_order_status; ?></td>
-          <td><select name="c2c_universal_payed_order_status_id">
-            <?php foreach ($order_statuses as $order_status) { ?>
-            <?php if ($order_status['order_status_id'] == $c2c_universal_payed_order_status_id) { ?>
-            <option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
-            <?php } else { ?>
-            <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-            <?php } ?>
-            <?php } ?>
-          </select></td>
-        </tr>
-        <tr>
-          <td><?php echo $entry_status; ?></td>
-          <td><select name="c2c_universal_status">
-            <?php if ($c2c_universal_status) { ?>
-            <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
-            <option value="0"><?php echo $text_disabled; ?></option>
-            <?php } else { ?>
-            <option value="1"><?php echo $text_enabled; ?></option>
-            <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
-            <?php } ?>
-          </select></td>
-        </tr>
-      </table>
-    </form>
+              <?php } ?>
+            </select></td>
+          </tr>
+          <!-- Поле статус заказа после подтверждения -->
+          <!-- Поле статус заказа после Оплаты -->
+          <tr>
+            <td><?php echo $entry_valid_order_status; ?></td>
+            <td><select name="c2c_universal_payed_order_status_id">
+              <?php foreach ($order_statuses as $order_status) { ?>
+              <?php if ($order_status['order_status_id'] == $c2c_universal_payed_order_status_id) { ?>
+              <option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+              <?php } else { ?>
+              <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+              <?php } ?>
+              <?php } ?>
+            </select></td>
+          </tr>
+          <!-- Поле статус заказа после Оплаты -->
+          <!-- Поле порядок вывода модуля -->
+          <tr>
+            <td><?php echo $entry_sort_order; ?></td>
+            <td><input type="text" name="c2c_universal_sort_order" value="<?php echo $c2c_universal_sort_order; ?>"></td>
+          </tr>
+          <!-- Поле порядок вывода модуля  -->
+          <!-- Поле статус модуля -->
+          <tr>
+            <td><?php echo $entry_status; ?></td>
+            <td><select name="c2c_universal_status">
+              <?php if ($c2c_universal_status) { ?>
+              <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+              <option value="0"><?php echo $text_disabled; ?></option>
+              <?php } else { ?>
+              <option value="1"><?php echo $text_enabled; ?></option>
+              <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+              <?php } ?>
+            </select></td>
+          </tr>
+          <!-- Поле статус модуля -->
+        </table>
+      </form>
+    </div>
   </div>
-</div>
 
-<?php echo $footer; ?>
+  <?php echo $footer; ?>

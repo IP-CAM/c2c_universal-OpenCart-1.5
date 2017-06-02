@@ -38,6 +38,7 @@ class ControllerPaymentC2cUniversal extends Controller {
 			'button_remove',
 			'text_card_number',
 			'text_select_bank',
+			'entry_sort_order',
 			'entry_status',
 			'entry_order_status',
 			'entry_valid_order_status',
@@ -84,6 +85,12 @@ class ControllerPaymentC2cUniversal extends Controller {
 			$this->data['c2c_universal_card'] = $this->request->post['c2c_universal_card'];
 		} else {
 			$this->data['c2c_universal_card'] = $this->config->get('c2c_universal_card');
+		}
+
+		if (isset($this->request->post['c2c_universal_sort_order'])) {
+			$this->data['c2c_universal_sort_order'] = $this->request->post['c2c_universal_sort_order'];
+		} else {
+			$this->data['c2c_universal_sort_order'] = $this->config->get('c2c_universal_sort_order');
 		}
 
 		if (isset($this->request->post['c2c_universal_status'])) {
@@ -171,6 +178,10 @@ class ControllerPaymentC2cUniversal extends Controller {
 		if (!$this->user->hasPermission('modify', 'payment/c2c_universal')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
+
+		if (strlen($this->request->post['c2c_universal_card']) < 16) {
+			$this->error['warning'] = $this->language->get('error_card');
+		}
 		
 		if (!$this->error) {
 			return TRUE;
@@ -201,7 +212,6 @@ class ControllerPaymentC2cUniversal extends Controller {
 		$settings['c2c_universal_card'] = "4XXX XXXX XXXX XXXX";
 
 		$this->model_setting_setting->editSetting('c2c_universal', $settings);	
-
 
 	}
 

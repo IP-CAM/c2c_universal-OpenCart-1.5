@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Модуль для быстро перевода с карты на карту. Работает через iframe со страницами перевода любого банка.
+ * @author Oleg Brizhanev<mr.brizhanev@yandex.ru>
+ */
+
 class ControllerPaymentC2cUniversal extends Controller {
 
 	//Функция генерации инструкции и кнопки оформления заказа
@@ -51,7 +56,7 @@ class ControllerPaymentC2cUniversal extends Controller {
 		$this->data['text_4number_button'] = $this->language->get('text_4number_button');
 		$this->data['text_4number_label'] = $this->language->get('text_4number_label');
 
-		//Если заказ оформлен успешно
+		//Если заказ оформлен 
 
 		if (isset($this->request->get['order'])) {
 
@@ -62,63 +67,42 @@ class ControllerPaymentC2cUniversal extends Controller {
 
 			$this->load->model('payment/c2c_universal');
 
-			if ($this->customer->isLogged()) {
-				$this->data['text_message'] = sprintf($this->language->get('text_customer'), $this->url->link('account/order/info&order_id=' . $this->request->get['order'], '', 'SSL'), $this->url->link('account/order', '', 'SSL'), $this->url->link('information/contact'));
-			} else {
-				$this->data['text_message'] = sprintf($this->language->get('text_guest'), $this->url->link('information/contact'));
-			}
-
 			$this->data['order'] = $order_info['order_id'];
 			$this->data['secure_code'] = $secure_code;
 			$this->data['action_url'] = $order_info['store_url'] . 'index.php';
 
 			$this->data['defaulttext'] = sprintf($this->language->get('text_default'), $this->config->get('c2c_universal_card'), (int)$order_info['total']);
 
-		} else {
-			if ($this->customer->isLogged()) {
-				$this->data['text_message'] = sprintf($this->language->get('text_customernotorder'), $this->url->link('account/order', '', 'SSL'), $this->url->link('information/contact'));
-			} else {
-				$this->data['text_message'] = sprintf($this->language->get('text_guest'), $this->url->link('information/contact'));
-			}
 		}
 
-		if (isset($this->request->get['first'])){
+		if (isset($this->session->data['order_id'])) {
+			$this->cart->clear();
 
-			if (isset($this->session->data['order_id'])) {
-				$this->cart->clear();
-
-				unset($this->session->data['shipping_method']);
-				unset($this->session->data['shipping_methods']);
-				unset($this->session->data['payment_method']);
-				unset($this->session->data['payment_methods']);
-				unset($this->session->data['guest']);
-				unset($this->session->data['comment']);
-				unset($this->session->data['order_id']);	
-				unset($this->session->data['coupon']);
-				unset($this->session->data['reward']);
-				unset($this->session->data['voucher']);
-				unset($this->session->data['vouchers']);
-			}
-
-			$this->data['heading_title'] = sprintf($this->language->get('text_neworder'), $this->request->get['order']);
-			$this->document->setTitle(sprintf($this->language->get('text_neworder'), $this->request->get['order']));
-		}
-		else {
-
-			if (isset($this->request->get['order'])) {
-				$this->data['heading_title'] = sprintf($this->language->get('heading_title_customer'), $this->request->get['order']);
-				$this->document->setTitle(sprintf($this->language->get('heading_title_customer'), $this->request->get['order']));
-			} else {
-				$this->data['heading_title'] = $this->language->get('heading_title');
-				$this->document->setTitle($this->language->get('heading_title'));
-			}
+			unset($this->session->data['shipping_method']);
+			unset($this->session->data['shipping_methods']);
+			unset($this->session->data['payment_method']);
+			unset($this->session->data['payment_methods']);
+			unset($this->session->data['guest']);
+			unset($this->session->data['comment']);
+			unset($this->session->data['order_id']);	
+			unset($this->session->data['coupon']);
+			unset($this->session->data['reward']);
+			unset($this->session->data['voucher']);
+			unset($this->session->data['vouchers']);
 		}
 
+		$this->data['heading_title'] = sprintf($this->language->get('text_neworder'), $this->request->get['order']);
+		$this->document->setTitle(sprintf($this->language->get('text_neworder'), $this->request->get['order']));
 
 		$this->data['continue'] = $this->url->link('common/home');
 		$this->data['button_continue'] = $this->language->get('button_continue');
 
 		$bank_code = $this->config->get('c2c_universal_active_bank');
+
+		/**
+		 * Таблица ссылок на страницы переводов с карты на карту различных банков
+		 * Имеют разную высоту
+		 */
 
 		switch ($bank_code) {
 			case 1:
@@ -141,43 +125,14 @@ class ControllerPaymentC2cUniversal extends Controller {
 			break;
 		}
 
-		if (isset($this->request->get['first'])){
+		/**
+		 * Вывод шаблона страницы оплаты
+		 */
 
-			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/c2c_success.tpl')) {
-				$this->template = $this->config->get('config_template') . '/template/payment/c2c_success.tpl';
-			} else {
-				$this->template = 'default/template/payment/c2c_success.tpl';
-			}
-		} else{
-
-			if (isset($this->request->get['order'])){
-
-				if ($this->config->get('cardtocard_order_status_id') != $order_info['order_status_id']) {
-					$this->data['defaulttext'] = sprintf($this->language->get('text_nopay'), $this->request->get['order'], $this->url->link('information/contact'));
-					$this->data['heading_title'] = sprintf($this->language->get('heading_title_customer_nopay'), $this->request->get['order']);
-					$this->document->setTitle(sprintf($this->language->get('heading_title_customer_nopay'), $this->request->get['order']));
-					if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/cardtocard_nopay.tpl')) {
-						$this->template = $this->config->get('config_template') . '/template/payment/cardtocard_nopay.tpl';
-					} else {
-						$this->template = 'default/template/payment/cardtocard_nopay.tpl';
-					}
-				} else {
-
-					if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/cardtocard_again.tpl')) {
-						$this->template = $this->config->get('config_template') . '/template/payment/cardtocard_again.tpl';
-					} else {
-						$this->template = 'default/template/payment/cardtocard_again.tpl';
-					}
-				}
-			} else{
-				$this->data['defaulttext'] = sprintf($this->language->get('text_static'));
-				if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/cardtocard_static.tpl')) {
-					$this->template = $this->config->get('config_template') . '/template/payment/cardtocard_static.tpl';
-				} else {
-					$this->template = 'default/template/payment/cardtocard_static.tpl';
-				}
-			}
-
+		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/c2c_success.tpl')) {
+			$this->template = $this->config->get('config_template') . '/template/payment/c2c_success.tpl';
+		} else {
+			$this->template = 'default/template/payment/c2c_success.tpl';
 		}
 
 		$this->children = array(
@@ -190,11 +145,16 @@ class ControllerPaymentC2cUniversal extends Controller {
 			);
 
 		$this->response->setOutput($this->render());
+
 	}
 
 	//Функция вызывается при подтверждении отплаты
-	
+
 	public function payed() {
+
+		/**
+		 * Валидация, если нет каких то параметров, 404 ошибка
+		 */
 
 		if (!isset($this->request->get['code']) || !isset($this->request->get['order']) || !isset($this->request->get['d4num'])){
 			$this->redirect($this->url->link('error/not_found'));
@@ -205,11 +165,16 @@ class ControllerPaymentC2cUniversal extends Controller {
 
 		$order_info = $this->model_checkout_order->getOrder($this->request->get['order']);
 
+		/**
+		 * Валидация, если не совпадает инфо о заказе, 404 ошибка
+		 */
 
-		$platp = substr(md5($order_info['order_id'] . "c2c_universal"), 0, 12);
-		if ($this->request->get['code'] != $platp) {
+		$secure_code = substr(md5($order_info['order_id'] . "c2c_universal"), 0, 12);
+
+		if ($this->request->get['code'] != $secure_code) {
 			$this->redirect($this->url->link('error/not_found'));
 		}
+
 		if ($this->config->get('c2c_universal_payed_order_status_id') != $order_info['order_status_id']){
 
 			$message = sprintf($this->language->get('success_customer_alert'), $order_info['order_id'], $this->request->get['d4num']) . "\n";
@@ -221,7 +186,9 @@ class ControllerPaymentC2cUniversal extends Controller {
 						        		// Text 
 			$text = sprintf($this->language->get('success_admin_alert'), $order_info['order_id'], $this->request->get['d4num']) . "\n";
 
-
+			/**
+			 * Отправка уведомления об оплаченном заказе на Email
+			 */
 
 			$mail = new Mail(); 
 			$mail->protocol = $this->config->get('config_mail_protocol');
@@ -238,7 +205,9 @@ class ControllerPaymentC2cUniversal extends Controller {
 			$mail->setText(html_entity_decode($text, ENT_QUOTES, 'UTF-8'));
 			$mail->send();
 
-								        // Send to additional alert emails
+			/**
+			 * Письма на дополнительные адреса
+			 */
 			$emails = explode(',', $this->config->get('config_alert_emails'));
 
 			foreach ($emails as $email) {
@@ -258,11 +227,9 @@ class ControllerPaymentC2cUniversal extends Controller {
 
 		$this->data['defaulttext'] = sprintf($this->language->get('text_payed'), $this->request->get['order'], $this->url->link('information/contact'));
 
-		if ($this->customer->isLogged()) {
-			$this->data['text_message'] = sprintf($this->language->get('text_customernotorder'), $this->url->link('account/order', '', 'SSL'), $this->url->link('information/contact'));
-		} else {
-			$this->data['text_message'] = sprintf($this->language->get('text_guest'), $this->url->link('information/contact'));
-		}
+		/**
+		 * Вывод шаблона страницы успешной оплаты
+		 */
 
 		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/c2c_payed.tpl')) {
 			$this->template = $this->config->get('config_template') . '/template/payment/c2c_payed.tpl';

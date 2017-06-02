@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Модуль для быстро перевода с карты на карту. Работает через iframe со страницами перевода любого банка.
+ * @author Oleg Brizhanev<mr.brizhanev@yandex.ru>
+ */
+
 class ModelPaymentC2cUniversal extends Model {
 		
 	/**
