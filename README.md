@@ -1,10 +1,9 @@
-# Модуль оплаты путем перевода с карты на карту для OpenCart 1.5
+# Module of payment by transfer from card to card for Opencart v.1.5
 
-## Описание
+## Description
 
-Модуль выводит на странице успешного оформления заказа iframe со страницей перевода с карты на карту выбранного вами в админке банка. После успешной оплаты заказу присваивается статус "Оплачено" и отправляется уведомление на Email администратора магазина.
+The module displays on the successful checkout page an iframe with the card-to-card transfer page of the bank you selected in the admin panel. After successful payment, the order is assigned the "Paid" status and a notification is sent to the email of the store administrator.
 
-## Установка
+## Installation
 
-Скопировать содержимое папки Upload в корневую папку с установленным опенкарт. Установить в разделе Дополнения - Оплата, выбрать банк, заполнить номер карты и включить модуль.
-
+Copy the contents of the Upload folder to the root folder with the installed opencart. Install in the Add-ons - Payment section, select a bank, fill in the card number and enable the module. 
